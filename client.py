@@ -20,7 +20,7 @@ def get_single_file(host, port, filename):
 def get_file_list(host, port, project):
     """Get list of files associated with project at host/port"""
 
-    request_url = 'http://' + host + ':' + str(port) + '/list'
+    request_url = 'http://%s:%d/list/%s' % (host, port, project)
 
     file_list = json.load(urllib2.urlopen(request_url))
 
@@ -38,6 +38,8 @@ def main():
 
     host = "localhost"
     port = 5000
+
+    get_all_files(host, port, 'surfy')
 
 
 
