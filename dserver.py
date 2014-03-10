@@ -4,6 +4,7 @@ Data server.
 """
 
 import os
+import logging
 
 from flask import send_file, Flask, request
 from flask import jsonify, abort
@@ -12,12 +13,12 @@ from itemise import itemise
 
 app = Flask(__name__)
 
-@app.route('/img')
-def index():
+@app.route('/img/<project>/<filename>')
+def index(project, filename):
     img_dir = 'img'
 
-    requested_file = request.args.get('name')
-    full_path = os.path.join(img_dir, requested_file)
+    full_path = os.path.join(img_dir, project, filename)
+    logging.debug('Client requested ' + full_path)
 
     return send_file(full_path, mimetype='image/png')
 
@@ -52,6 +53,16 @@ def wurble(project):
     return 'wurlble!' + project
 
 def main():
+
+    try:
+        os.mkdir('log')
+    except OSError, e:
+        if e.errno == 17: # Directory exists
+            pass
+        else:
+            raise e
+
+    logging.basicConfig(filename='log/dserver.log', level=logging.DEBUG)
     app.run(debug=True)
 
 if __name__ == "__main__":

@@ -6,5 +6,10 @@ getassoc - download associated data. Works by first retrieving URLs then grabbin
 
 ## Server:
 
-/img/project/filename
-/img/project/list
+GET /img/project/filename
+
+
+
+GET /list/project
+
+List files associates with project

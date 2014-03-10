@@ -6,11 +6,13 @@ Test initial data grabber idea.
 import json
 import urllib2
 
-def get_single_file(host, port, filename):
+def get_single_file(host, port, project, filename):
     """Get single file from specified host/port and save to current directory.
     """
 
-    request_url = 'http://' + host + ':' + str(port) + '/img?name=' + filename
+    request_url = 'http://%s:%d/img/%s/%s' % (host, port, project, filename)
+
+    #print "Will request", request_url
 
     f_url = urllib2.urlopen(request_url)
 
@@ -32,7 +34,7 @@ def get_all_files(host, port, project):
 
     for f in file_list['allfiles']:
         print 'Fetching', f['name']
-        get_single_file(host, port, f['name'])
+        get_single_file(host, port, project, f['name'])
     
 def main():
 
