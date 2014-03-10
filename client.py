@@ -3,8 +3,11 @@
 Test initial data grabber idea.
 """
 
+import os
 import json
 import urllib2
+
+import requests
 
 def get_single_file(host, port, project, filename):
     """Get single file from specified host/port and save to current directory.
@@ -35,15 +38,26 @@ def get_all_files(host, port, project):
     for f in file_list['allfiles']:
         print 'Fetching', f['name']
         get_single_file(host, port, project, f['name'])
+
+def upload_file(host, port, project, local_file):
+    """Upload local file to server"""
+
+    filename = os.path.basename(local_file)
+
+    request_url = 'http://%s:%d/upload/%s/%s' % (host, port, project, filename)
+
+    files = {'file': open(local_file, 'rb')}
+
+    r = requests.post(request_url, files=files)
     
 def main():
 
     host = "localhost"
     port = 5000
 
-    get_all_files(host, port, 'surfy')
-
-
+    #get_all_files(host, port, 'surfy')
+    #upload_file(host, port, 'testproj', 'Gravatar.png')
+    upload_file(host, port, 'testproj', '/Users/hartleym/Dropbox/Tufte.pdf')
 
 if __name__ == "__main__":
     main()

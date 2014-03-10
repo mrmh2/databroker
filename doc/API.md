@@ -13,3 +13,7 @@ GET /img/project/filename
 GET /list/project
 
 List files associates with project
+
+POST /upload/project/filename
+
+Add file to project

@@ -8,6 +8,7 @@ import logging
 
 from flask import send_file, Flask, request
 from flask import jsonify, abort
+from werkzeug.utils import secure_filename
 
 from itemise import itemise
 
@@ -22,24 +23,6 @@ def index(project, filename):
 
     return send_file(full_path, mimetype='image/png')
 
-comp_im = [
-    { 'name' : 'projection1.png',
-      'type' : 'png' },
-    { 'name' : 'projection2.png',
-      'type' : 'png' },
-]
-
-surfy = [
-    { 'name' : 'surface.png',
-      'type' : 'png' }
-]
-
-all_projects = {
-    'compimg' : comp_im,
-    'surfy' : surfy
-}
-
-all_projects = itemise('img')
     
 @app.route('/list/<project>')
 def getlist(project):
@@ -51,6 +34,20 @@ def getlist(project):
 @app.route('/wurble/<project>')
 def wurble(project):
     return 'wurlble!' + project
+
+@app.route('/upload/<project>/<filename>', methods=['POST'])
+def upload(project, filename):
+
+    img_dir = os.path.join('img', project)
+
+
+    filename = secure_filename(filename)
+    file = request.files['file']
+    dest_path = os.path.join(img_dir, filename)
+    logging.debug('Will save POSTed data to ' + dest_path)
+    file.save(dest_path)
+
+    return 'Success'
 
 def main():
 
