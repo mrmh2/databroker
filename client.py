@@ -49,6 +49,13 @@ def upload_file(host, port, project, local_file):
     files = {'file': open(local_file, 'rb')}
 
     r = requests.post(request_url, files=files)
+
+def create_proj(host, port, project):
+    """Create new project"""
+
+    request_url = 'http://%s:%d/create/%s' % (host, port, project)
+
+    r = requests.post(request_url)
     
 def main():
 
@@ -57,7 +64,8 @@ def main():
 
     #get_all_files(host, port, 'surfy')
     #upload_file(host, port, 'testproj', 'Gravatar.png')
-    upload_file(host, port, 'testproj', '/Users/hartleym/Dropbox/Tufte.pdf')
+    #upload_file(host, port, 'testproj', '/Users/hartleym/Dropbox/Tufte.pdf')
+    create_proj(host, port, 'newproj')
 
 if __name__ == "__main__":
     main()

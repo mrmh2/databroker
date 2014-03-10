@@ -14,11 +14,11 @@ from itemise import itemise
 
 app = Flask(__name__)
 
+data_root = 'img'
+
 @app.route('/img/<project>/<filename>')
 def index(project, filename):
-    img_dir = 'img'
-
-    full_path = os.path.join(img_dir, project, filename)
+    full_path = os.path.join(data_root, project, filename)
     logging.debug('Client requested ' + full_path)
 
     return send_file(full_path, mimetype='image/png')
@@ -31,23 +31,33 @@ def getlist(project):
     else:
         abort(404)
 
-@app.route('/wurble/<project>')
-def wurble(project):
-    return 'wurlble!' + project
-
 @app.route('/upload/<project>/<filename>', methods=['POST'])
 def upload(project, filename):
 
-    img_dir = os.path.join('img', project)
-
+    data_dir = os.path.join(data_root, project)
 
     filename = secure_filename(filename)
     file = request.files['file']
-    dest_path = os.path.join(img_dir, filename)
+    dest_path = os.path.join(data_dir, filename)
     logging.debug('Will save POSTed data to ' + dest_path)
     file.save(dest_path)
 
     return 'Success'
+
+@app.route('/create/<project>', methods=['POST'])
+def create(project):
+
+    project_dir = os.path.join(data_root, project)
+
+    try:
+        os.mkdir(project_dir)
+    except OSError, e:
+        if e.errno == 17:
+            pass
+        else:
+            raise e
+
+    return 'Success' # TODO: Failure
 
 def main():
 
