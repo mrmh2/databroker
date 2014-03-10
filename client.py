@@ -8,8 +8,8 @@ import json
 import string
 import random
 import urllib2
+import argparse
 import tempfile
-
 
 import requests
 
@@ -94,28 +94,78 @@ class DserverClient(object):
 	
         r = requests.post(request_url, files=files)
 
-def test_server(host, port):
-    
-    dsc = DserverClient(host, port)
+    def get_file_list(self, project):
+        """Get list of files associated with project at host/port"""
+   
+        request_url = self.urlroot + '/list/%s' % project
+   
+        file_list = json.load(urllib2.urlopen(request_url))
+   
+        return file_list
 
-    project_name = ''.join(random.choice(string.lowercase) for _ in range(10))
-    dsc.create_project(project_name)
+    def get_single_file(self, project, filename):
+        """Get single file from specified host/port and save to current directory.
+        """
+    
+        request_url = self.urlroot + '/img/%s/%s' % (project, filename)
+    
+        f_url = urllib2.urlopen(request_url)
+    
+        with open(filename, 'wb') as f:
+            f.write(f_url.read())
+
+    def get_all_files(self, project):
+    
+        file_list = self.get_file_list(project)
+    
+        for f in file_list['allfiles']:
+            self.get_single_file(project, f['name'])
+
+        return [f['name'] for f in file_list['allfiles']]
+    
+def create_test_file(test_text):
 
     f = tempfile.NamedTemporaryFile(delete=False)
-
-    f.write('wurble, wurble\n')
+    f.write(test_text)
     f.close()
 
-    dsc.upload_file(project_name, f.name)
+    return f.name
 
-    #dsc.delete_project(project_name)
+def test_server(host, port):
+    
+    project_name = ''.join(random.choice(string.lowercase) for _ in range(10))
 
-    os.remove(f.name)
+    # Create the client object
+    dsc = DserverClient(host, port)
+
+    # Test project creation
+    dsc.create_project(project_name)
+
+    # Test file upload
+    test_text = 'hello, hello'
+    test_file = create_test_file(test_text)
+    dsc.upload_file(project_name, test_file)
+
+    # Test file download
+    fnames = dsc.get_all_files(project_name)
+    assert open(fnames[0]).readlines()[0] == test_text
+    for fn in fnames:
+        os.remove(fn)
+
+    os.remove(test_file)
+
+    # Test project deletion
+    dsc.delete_project(project_name)
 
 def main():
 
-    host = "localhost"
-    port = 5000
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", help="server hostname", default="localhost")
+    parser.add_argument("--port", help="server port", default=5000)
+    args = parser.parse_args()
+
+    host = args.host
+    port = args.port
 
     test_server(host, port)
 

@@ -22,6 +22,10 @@ POST /upload/project/filename
 
 Add file to project
 
-### Delete a project
+### Create a project
 
 POST /create/project
+
+### Delete a project
+
+DELETE /delete/project

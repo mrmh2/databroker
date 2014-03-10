@@ -17,8 +17,10 @@ app = Flask(__name__)
 
 data_root = 'img'
 
+all_projects = itemise(data_root)
+
 @app.route('/img/<project>/<filename>')
-def index(project, filename):
+def get_file(project, filename):
     full_path = os.path.join(data_root, project, filename)
     logging.debug('Client requested ' + full_path)
 
@@ -26,7 +28,10 @@ def index(project, filename):
 
     
 @app.route('/list/<project>')
-def getlist(project):
+def get_list(project):
+
+    all_projects = itemise(data_root)
+
     if project in all_projects:
         return jsonify( { 'allfiles' : all_projects[project] } )
     else:
