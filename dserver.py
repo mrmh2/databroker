@@ -4,6 +4,7 @@ Data server.
 """
 
 import os
+import shutil
 import logging
 
 from flask import send_file, Flask, request
@@ -58,6 +59,20 @@ def create(project):
             raise e
 
     return 'Success' # TODO: Failure
+
+@app.route('/delete/<project>', methods=['DELETE'])
+def delete(project):
+    
+    project_dir = os.path.join(data_root, project)
+
+    logging.debug('Will delete ' + project_dir)
+
+    try:
+        shutil.rmtree(project_dir)
+    except OSError, e:
+        print e
+
+    return 'Success' # TODO: More failure
 
 def main():
 
